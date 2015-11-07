@@ -35,10 +35,24 @@ def convert_dna(outf, fdat, flab, num=-1):
 			acgt[i]=3
 
 	line=0
+
+	q = 3 # parameter of q-gram
+
 	while d and l and (num<0 or line<num):
 		offs=1
 		s=l[:-1]
-		for i in xrange(len(d)-1):
+		for i in xrange(len(d)-q):
+			tmp = d[i:i+q]
+			print tmp,
+			r = 0
+			order = 1
+			for j in xrange(q):
+				r = r + acgt[ord(tmp[j])]*order
+				order = order * 4
+			print r 
+
+
+
 			s+=" %d:1.0" % (offs+acgt[ord(d[i])])
 			offs+=4
 		outf.write(s + '\n')
@@ -116,69 +130,8 @@ def convert_webspam(outf, fdat, flab, num=-1):
 		if not r:
 			break
 
-
-# convert image
-def convert_img(outf, fdat, flab, dims, normalize=False, num=-1):
-	d=fdat.read(dims)
-	l=read_label_line(flab)
-
-	line=0
-	while d and l and (num<0 or line<num):
-		s=l[:-1]
-		ostr=[ord(i) for i in d]
-		if normalize:
-			sum=0.0
-			for i in xrange(len(ostr)-1):
-				sum+=ostr[i]*ostr[i]
-			sum=math.sqrt(sum)
-
-			if sum==0.0: # trap divide by zero
-				sum=1.0
-
-			for i in xrange(len(ostr)-1):
-				s+=" %d:%g" % (i+1, ostr[i]/sum)
-		else:
-			for i in xrange(len(ostr)-1):
-				s+=" %d:%d" % (i+1, ostr[i])
-		outf.write(s + '\n')
-		d=fdat.read(dims)
-		l=read_label_line(flab)
-		line+=1;
-
-		if not line % 1000:
 			sys.stderr.write( '\r%d' % line)
 
-# convert ascii
-def convert_dense_ascii(outf, fdat, flab, normalize=False, num=-1):
-	d=fdat.readline()
-	l=read_label_line(flab)
-
-	line=0
-	while d and l and (num<0 or line<num):
-		s=l[:-1]
-		ostr=d.strip().split(' ')
-		if normalize:
-			sum=0.0
-			for i in xrange(len(ostr)):
-				x=float(ostr[i])
-				sum+=x*x
-			sum=math.sqrt(sum)
-
-			if sum==0.0: # trap divide by zero
-				sum=1.0
-
-			for i in xrange(len(ostr)):
-				s+=" %s:%g" % (i+1, float(ostr[i])/sum)
-		else:
-			for i in xrange(len(ostr)):
-				s+=" %s:%s" % (i+1, ostr[i])
-		outf.write(s + '\n')
-		d=fdat.readline()
-		l=read_label_line(flab)
-		line+=1;
-
-		if not line % 1000:
-			sys.stderr.write( '\r%d' % line)
 
 def parse_options():
 	parser = optparse.OptionParser(usage="%prog [options] {dna|webspam|ocr|fd|alpha|beta|gamma|delta|epsilon|zeta} {train|val|test}\n\n"
@@ -219,13 +172,3 @@ if __name__ == '__main__':
 
 	if d=='dna':
 		convert_dna(outf, fdat,flab, num)
-	elif d=='webspam':
-		convert_webspam(outf, fdat,flab, num)
-	elif d=='ocr':
-		convert_img(outf, fdat,flab, 1156, True, num)
-	elif d=='fd':
-		convert_img(outf, fdat,flab, 900, True, num)
-	elif d in ('alpha', 'beta', 'epsilon', 'zeta'):
-		convert_dense_ascii(outf, fdat,flab, True, num)
-	elif d in ('gamma', 'delta'):
-		convert_dense_ascii(outf, fdat,flab, False, num)
