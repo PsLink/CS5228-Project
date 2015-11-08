@@ -36,26 +36,60 @@ def convert_dna(outf, fdat, flab, num=-1):
 
 	line=0
 
-	q = 3 # parameter of q-gram
+	q = 4 # parameter of q-gram
+	n = 1
+	for i in xrange(q):
+		n = n*4
 
 	while d and l and (num<0 or line<num):
 		offs=1
 		s=l[:-1]
+		#print line,
+
+		qSig = []
+		for i in xrange(n):
+			qSig.append(0)
+
 		for i in xrange(len(d)-q):
 			tmp = d[i:i+q]
-			print tmp,
+			#print tmp,
 			r = 0
 			order = 1
 			for j in xrange(q):
 				r = r + acgt[ord(tmp[j])]*order
 				order = order * 4
-			print r 
-
-
+			#print r
+			qSig[r] = 1
 
 			s+=" %d:1.0" % (offs+acgt[ord(d[i])])
 			offs+=4
 		outf.write(s + '\n')
+		#print "qSig",qSig
+
+		cSig = []
+
+		lamda = int(round(n/20)) # lamda
+
+		for i in range(0,n,lamda):
+			tmpSum = 0
+			for k in range(0,lamda):
+				if (i+k == n):
+					break
+				tmpSum = tmpSum + qSig[i+k]
+			cSig.append(tmpSum)
+
+		#print "cSig",cSig
+
+		hValue = 0
+		order = 1
+		for i in xrange(len(cSig)):
+			if cSig[i] > 0:
+				hValue = hValue + order
+			order = order*2
+
+		#print "hash:",hValue
+		print hValue
+
 		d=fdat.readline()
 		l=read_label_line(flab)
 		line+=1;
