@@ -23,6 +23,7 @@ def read_label_line(flab):
 # binary features for dna
 def convert_dna(outf, fdat, flab, num=-1):
 	hashfile = file('hash.txt','wb')
+	cSigfile = file('cSig.txt','wb')
 
 
 	d=fdat.readline()
@@ -81,7 +82,9 @@ def convert_dna(outf, fdat, flab, num=-1):
 				tmpSum = tmpSum + qSig[i+k]
 			cSig.append(tmpSum)
 
-		#print "cSig",cSig
+		for i in cSig:
+			cSigfile.write(str(i)+' ')
+		cSigfile.write('\n')
 
 		hValue = 0
 		order = 1
