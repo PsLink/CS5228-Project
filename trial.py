@@ -22,9 +22,6 @@ def read_label_line(flab):
 
 # binary features for dna
 def convert_dna(outf, fdat, flab, num=-1):
-	hashfile = file('hash.txt','wb')
-
-
 	d=fdat.readline()
 	l=read_label_line(flab)
 	acgt=range(0,256)
@@ -39,12 +36,14 @@ def convert_dna(outf, fdat, flab, num=-1):
 
 	line=0
 
-	q = 4 # parameter of q-gram
+	q = 2 # parameter of q-gram
 	n = 1
 	for i in xrange(q):
 		n = n*4
 
+	DNA_Seq = ['ACGGT','CTTAG','ACGTT','TAAGC','GACGT',]
 	while d and l and (num<0 or line<num):
+		d = DNA_Seq[line]
 		offs=1
 		s=l[:-1]
 		#print line,
@@ -55,6 +54,7 @@ def convert_dna(outf, fdat, flab, num=-1):
 
 		for i in xrange(len(d)-q+1):
 			tmp = d[i:i+q]
+			print tmp,
 			#print tmp,
 			r = 0
 			order = 1
@@ -67,11 +67,13 @@ def convert_dna(outf, fdat, flab, num=-1):
 			s+=" %d:1.0" % (offs+acgt[ord(d[i])])
 			offs+=4
 		outf.write(s + '\n')
-		#print "qSig",qSig
+		print "qSig",qSig
 
 		cSig = []
 
-		lamda = int(round(n/22)) # lamda
+		#lamda = int(round(n/20)) # lamda
+		lamda = 2
+
 
 		for i in range(0,n,lamda):
 			tmpSum = 0
@@ -81,7 +83,7 @@ def convert_dna(outf, fdat, flab, num=-1):
 				tmpSum = tmpSum + qSig[i+k]
 			cSig.append(tmpSum)
 
-		#print "cSig",cSig
+		print "cSig",cSig
 
 		hValue = 0
 		order = 1
@@ -90,16 +92,88 @@ def convert_dna(outf, fdat, flab, num=-1):
 				hValue = hValue + order
 			order = order*2
 
-		hashfile.write(str(hValue)+'\n') 
-		#print hValue
+		#print "hash:",hValue
+		print hValue
 
-		d=fdat.readline()
+		#d=fdat.readline()
 
 		l=read_label_line(flab)
 		line+=1;
 
+
+
 		if not line % 1000:
 			sys.stderr.write( '\r%d' % line)
+
+# 3-grams for webspam
+def convert_webspam(outf, fdat, flab, num=-1):
+
+	def ngramify(o, s):
+		l=len(s)-3
+		ostr=[ord(i) for i in s]
+
+		lst=[ (((ostr[i]<<8)+ostr[i+1])<<8)+ostr[i+2] for i in xrange(l) ]
+		lst.sort()
+
+		ngrams=list()
+
+		j=0
+		sum=0
+		for i in xrange(l):
+			ngram=None
+			if i==l-1:
+				if lst[j]!=lst[i]:
+					ngram=(lst[j], i-j)
+				else:
+					ngram=(lst[i], 1)
+			else:
+				if lst[j]!=lst[i+1]:
+					ngram=(lst[j], i-j+1)
+					j=i+1
+			if ngram:
+				sum+=ngram[1]*ngram[1]
+				ngrams.append(ngram)
+
+		sum=math.sqrt(float(sum))
+
+		if sum==0.0: # trap divide by zero
+			sum=1.0
+
+		for ngram in ngrams:
+			o+=" %d:%g" % (ngram[0]+1, ngram[1]/sum)
+		outf.write(o + '\n')
+
+
+	line=0
+	d=''
+	while (num<0 or line<num):
+		r='x'
+		while r and r.find('\0') == -1:
+			r=fdat.read(1048576)
+			if r:
+				d+=r
+
+		start=0
+		while (num<0 or line<num):
+			idx=d.find('\0',start)
+			if idx==-1:
+				d=d[(start+1):]
+				break
+			else:
+				l=read_label_line(flab)
+				o=l[:-1]
+				ngramify(o, d[start:idx])
+				start=idx+1
+				line+=1;
+
+		sys.stderr.write( '\rPROGRESS: %d' % line)
+
+		#eof
+		if not r:
+			break
+
+			sys.stderr.write( '\r%d' % line)
+
 
 def parse_options():
 	parser = optparse.OptionParser(usage="%prog [options] {dna|webspam|ocr|fd|alpha|beta|gamma|delta|epsilon|zeta} {train|val|test}\n\n"
