@@ -22,6 +22,9 @@ def read_label_line(flab):
 
 # binary features for dna
 def convert_dna(outf, fdat, flab, num=-1):
+	hashfile = file('hash.txt','wb')
+	cSigfile = file('cSig.txt','wb')
+
 	d=fdat.readline()
 	l=read_label_line(flab)
 	acgt=range(0,256)
@@ -54,7 +57,6 @@ def convert_dna(outf, fdat, flab, num=-1):
 
 		for i in xrange(len(d)-q+1):
 			tmp = d[i:i+q]
-			print tmp,
 			#print tmp,
 			r = 0
 			order = 1
@@ -67,7 +69,7 @@ def convert_dna(outf, fdat, flab, num=-1):
 			s+=" %d:1.0" % (offs+acgt[ord(d[i])])
 			offs+=4
 		outf.write(s + '\n')
-		print "qSig",qSig
+		#print "qSig",qSig
 
 		cSig = []
 
@@ -83,6 +85,9 @@ def convert_dna(outf, fdat, flab, num=-1):
 				tmpSum = tmpSum + qSig[i+k]
 			cSig.append(tmpSum)
 
+		for i in cSig:
+			cSigfile.write(str(i)+' ')
+		cSigfile.write('\n')
 		print "cSig",cSig
 
 		hValue = 0
@@ -92,10 +97,10 @@ def convert_dna(outf, fdat, flab, num=-1):
 				hValue = hValue + order
 			order = order*2
 
-		#print "hash:",hValue
-		print hValue
+		print "hash:",hValue
+		hashfile.write(str(hValue)+'\n') 
 
-		#d=fdat.readline()
+		# d=fdat.readline()
 
 		l=read_label_line(flab)
 		line+=1;
@@ -104,76 +109,6 @@ def convert_dna(outf, fdat, flab, num=-1):
 
 		if not line % 1000:
 			sys.stderr.write( '\r%d' % line)
-
-# 3-grams for webspam
-def convert_webspam(outf, fdat, flab, num=-1):
-
-	def ngramify(o, s):
-		l=len(s)-3
-		ostr=[ord(i) for i in s]
-
-		lst=[ (((ostr[i]<<8)+ostr[i+1])<<8)+ostr[i+2] for i in xrange(l) ]
-		lst.sort()
-
-		ngrams=list()
-
-		j=0
-		sum=0
-		for i in xrange(l):
-			ngram=None
-			if i==l-1:
-				if lst[j]!=lst[i]:
-					ngram=(lst[j], i-j)
-				else:
-					ngram=(lst[i], 1)
-			else:
-				if lst[j]!=lst[i+1]:
-					ngram=(lst[j], i-j+1)
-					j=i+1
-			if ngram:
-				sum+=ngram[1]*ngram[1]
-				ngrams.append(ngram)
-
-		sum=math.sqrt(float(sum))
-
-		if sum==0.0: # trap divide by zero
-			sum=1.0
-
-		for ngram in ngrams:
-			o+=" %d:%g" % (ngram[0]+1, ngram[1]/sum)
-		outf.write(o + '\n')
-
-
-	line=0
-	d=''
-	while (num<0 or line<num):
-		r='x'
-		while r and r.find('\0') == -1:
-			r=fdat.read(1048576)
-			if r:
-				d+=r
-
-		start=0
-		while (num<0 or line<num):
-			idx=d.find('\0',start)
-			if idx==-1:
-				d=d[(start+1):]
-				break
-			else:
-				l=read_label_line(flab)
-				o=l[:-1]
-				ngramify(o, d[start:idx])
-				start=idx+1
-				line+=1;
-
-		sys.stderr.write( '\rPROGRESS: %d' % line)
-
-		#eof
-		if not r:
-			break
-
-			sys.stderr.write( '\r%d' % line)
-
 
 def parse_options():
 	parser = optparse.OptionParser(usage="%prog [options] {dna|webspam|ocr|fd|alpha|beta|gamma|delta|epsilon|zeta} {train|val|test}\n\n"

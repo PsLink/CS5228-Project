@@ -46,6 +46,7 @@ def convert_dna(outf, fdat, flab, num=-1):
 		n = n*4
 
 	while d and l and (num<0 or line<num):
+		#print d
 		offs=1
 		s=l[:-1]
 		#print line,
@@ -82,9 +83,9 @@ def convert_dna(outf, fdat, flab, num=-1):
 				tmpSum = tmpSum + qSig[i+k]
 			cSig.append(tmpSum)
 
-		for i in cSig:
-			cSigfile.write(str(i)+' ')
-		cSigfile.write('\n')
+		#for i in cSig:
+		#	cSigfile.write(str(i)+' ')
+		#cSigfile.write('')
 
 		hValue = 0
 		order = 1
@@ -93,7 +94,7 @@ def convert_dna(outf, fdat, flab, num=-1):
 				hValue = hValue + order
 			order = order*2
 
-		hashfile.write(str(hValue)+'\n') 
+		#hashfile.write(str(hValue)+'\n') 
 		#print hValue
 
 		d=fdat.readline()

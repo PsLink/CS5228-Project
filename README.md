@@ -1,1 +1,1 @@
-# Project of CS5228
+conver.py  -- change the origin data into features, hashvalue and c-Signature
