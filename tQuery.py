@@ -6,7 +6,7 @@ import fileinput
 import math
 
 
-errBound = 10
+errBound = 20
 score = 0
 candidate = set([])
 
@@ -25,8 +25,38 @@ def SDist(x,y):
 		ans = ans + abs(x[i] - y[i])
 	return ans
 
-def search(k, table, query):
-	print k, table, query
+def search(k, table, query, iniScore):
+	filename = "treeO_"+str(k)+".txt"
+	#print "searching",k
+	f = open(filename,'r')
+
+	ans = set([])
+
+	i = f.readline()
+
+
+	while (len(i)>0):
+		tmpScore = iniScore
+
+		sig = i.split()
+
+		insID = int(sig[0])
+		#print insID
+
+		offs = 0
+
+		for j in sig[1:]:
+			tmpScore = tmpScore + SDist(transback(int(j)),query[offs:offs+4])
+			offs = offs + 4
+			if tmpScore > errBound:
+				break
+
+		if tmpScore<=errBound:
+			ans.add(insID)
+
+		i = f.readline()
+
+	return ans
 
 
 
@@ -38,23 +68,22 @@ def main():
 	insID = 0
 	for i in fileinput.input("tree0.txt"):
 		table = i.split()
-
-		k = int(table[0])
+		#print "------------"
+		k = int(table[0])		
 
 		score = SDist(transback(int(table[0])),qHead)
 
 		if (score<=errBound):
-			tmpCan = search(k, table[1:],query[4:])
-			break
-
+			# might filter the table with hash filter
+			tmpCan = search(k, table[1:],query[4:],score)
+			if len(tmpCan) > 0:
+				#print tmpCan
+				for t in tmpCan:
+					candidate.add(t)
 
 		insID = insID+1
 
-
-
-
-
-
+	print candidate
 
 
 

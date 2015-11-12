@@ -17,10 +17,10 @@ for i in xrange(treeSize):
 # 	ans = []
 # 	order = 1728
 # 	while order >= 1:
-# 		ans.append(k/order)
+# 		ans.insert(0,k/order)
 # 		k = k % order
 # 		order = order / 12
-# 	print ans
+# 	return ans
 
 def treeHead(sig,idNum):
 	k = 0
@@ -29,6 +29,8 @@ def treeHead(sig,idNum):
 		k = k + int(i)*order
 		order = order * BASE
 	tree0[k].add(idNum)
+
+	#print transback(k)
 
 
 def treeInsert(sig,idNum):
@@ -45,7 +47,7 @@ def main():
 	#treeOtherfile = file('treeOther.txt','wb')
 	insID = 0
 
-	for i in fileinput.input("cSig.txt"):
+	for i in fileinput.input("cSig1.txt"):
 		i = i.split()
 		treeHead(i[0:height],insID)
 		
