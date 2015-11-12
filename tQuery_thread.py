@@ -11,28 +11,23 @@ score = 0
 candidate = set([])
 threadLock = threading.Lock()
 
-class myThread (threading.Thread):   #继承父类threading.Thread
+class myThread (threading.Thread):   
+    #继承父类threading.Thread
     def __init__(self, k, table, query, s):
         threading.Thread.__init__(self)
         self.threadID = k
         self.table = table
         self.query = query
         self.socre = s
-    def run(self):                   #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
+    def run(self):                   
+        #把要执行的代码写到run函数里面 线程在创建后会直接运行run函数 
         #print "Starting " + str(self.threadID)
         # 获得锁，成功获得锁定后返回True
-        threadLock.acquire()
+        #threadLock.acquire()
         search(self.threadID, self.table, self.query, self.socre)
         # 释放锁
-        threadLock.release()
+        #threadLock.release()
         #print "Exiting " + str(self.threadID)
-
-def print_time(threadName, delay, counter):
-    while counter:
-        time.sleep(delay)
-        print "%s: %s" % (threadName, time.ctime(time.time()))
-        counter -= 1
-
 
 def SDist(k,y):
         ans = 0
@@ -103,7 +98,7 @@ def main():
                         # 开启线程
                         threads[-1].start()
 
-                        if len(threads) > 50:
+                        if len(threads) > 100:
                                 for t in threads:
                                         t.join()
                                 threads = []
