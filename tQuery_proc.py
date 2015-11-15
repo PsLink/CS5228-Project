@@ -7,7 +7,7 @@ import fileinput
 import math
 import time
 
-errBound = 15
+errBound = 30
 score = 0
 candidate = []
 candidate = Manager().list()
@@ -26,7 +26,7 @@ def SDist(k,y):
 def search(k, table, query, iniScore):
         filename = "treeO_"+str(k)+".txt"
         #print "searching",k
-        f = open(filename,'r')
+        f = open("../treeFile/"+filename,'r')
 
         ans = set([])
 
@@ -58,12 +58,25 @@ def search(k, table, query, iniScore):
 
 
         if len(ans)>0:
-            print ans
+            #print ans
             for t in ans:
                 candidate.append(t)
 
-def main():
-        query = [4,6,4,5,4,4,8,6,4,4,7,5,4,6,5,5,4,3,4,8,7,7,4,2]
+def main(q):
+
+        #query = [4,6,4,5,4,4,8,6,4,4,7,5,4,6,5,5,4,3,4,8,7,7,4,2]
+
+        outf = open("queryFiles/"+q[0]+".txt",'w')
+        
+        query = q[1:]
+
+        for i in xrange(24):
+            query[i] = int(query[i])
+
+        #print query
+
+
+
 
         start = time.time()
 
@@ -97,9 +110,11 @@ def main():
         p.close()
         p.join()
 
-        candidate.sort()
+        #candidate.sort()
+        for i in candidate:
+            outf.write(str(i)+'\n')
 
-        print candidate
+        #outf.write(str(candidate)) 
         print len(candidate)
         
         end = time.time()
@@ -108,4 +123,10 @@ def main():
 
 
 if __name__ == '__main__':
-        main()
+
+    fQuery = open('query_cSig.txt','r')
+    q = fQuery.readline()
+    while q:
+        main(q.split())
+        q = fQuery.readline()
+    fQuery.close()
