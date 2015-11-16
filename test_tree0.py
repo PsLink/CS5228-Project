@@ -1,3 +1,9 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+# test if the tree is built properly
+# and check the distribution of it
+
 import fileinput
 import random
 

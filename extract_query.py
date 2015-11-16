@@ -1,4 +1,4 @@
-# extract +1 instance
+# extract cSig&Hash value of +1 instance as query point
 
 import fileinput
 

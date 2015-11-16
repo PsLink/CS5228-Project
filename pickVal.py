@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 
-# convert things into svm-light format
-
-# transfer the original data into hash & cSig as well
-
-#<line> .=. <target> <feature>:<value> <feature>:<value> ... <feature>:<value> # <info>
-#<target> .=. +1 | -1 | 0 | <float> 
-#<feature> .=. <integer> | "qid"
-#<value> .=. <float>
-#<info> .=. <string> 
+# pickup the +1 examples in the original data
 
 import optparse
 import bz2
@@ -24,82 +16,23 @@ def read_label_line(flab):
 
 # binary features for dna
 def convert_dna(outf, fdat, flab, num=-1):
-	hashfile = file('hash.txt','wb')
-	cSigfile = file('cSig.txt','wb')
+	queryfile = file('query.txt','wb')
 
 
-	d=fdat.readline()
+	#d=fdat.readline()
 	l=read_label_line(flab)
-	acgt=range(0,256)
-	for i in xrange(256):
-		acgt[i]=0
-		if i==ord('C'):
-			acgt[i]=1
-		elif i==ord('G'):
-			acgt[i]=2
-		elif i==ord('T'):
-			acgt[i]=3
 
 	line=0
-
-	q = 4 # parameter of q-gram
-	n = 1
-	for i in xrange(q):
-		n = n*4
 
 	while d and l and (num<0 or line<num):
 		#print d
 		offs=1
 		s=l[:-1]
-		#print line,
 
-		qSig = []
-		for i in xrange(n):
-			qSig.append(0)
+		if s=="+1":
+			print line
 
-		for i in xrange(len(d)-q+1):
-			tmp = d[i:i+q]
-			#print tmp,
-			r = 0
-			order = 1
-			for j in xrange(q):
-				r = r + acgt[ord(tmp[q-j-1])]*order
-				order = order * 4
-			#print r
-			qSig[r] = 1
-
-			s+=" %d:1.0" % (offs+acgt[ord(d[i])])
-			offs+=4
-		outf.write(s + '\n')
-		#print "qSig",qSig
-
-		cSig = []
-
-		lamda = int(round(n/22)) # lamda
-
-		for i in range(0,n,lamda):
-			tmpSum = 0
-			for k in range(0,lamda):
-				if (i+k == n):
-					break
-				tmpSum = tmpSum + qSig[i+k]
-			cSig.append(tmpSum)
-
-		#for i in cSig:
-		#	cSigfile.write(str(i)+' ')
-		#cSigfile.write('')
-
-		hValue = 0
-		order = 1
-		for i in xrange(len(cSig)):
-			if cSig[i] > 0:
-				hValue = hValue + order
-			order = order*2
-
-		#hashfile.write(str(hValue)+'\n') 
-		#print hValue
-
-		d=fdat.readline()
+		#d=fdat.readline()
 
 		l=read_label_line(flab)
 		line+=1;

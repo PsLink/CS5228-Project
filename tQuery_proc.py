@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+# Mulitprocess version of kNN query
+
 from multiprocessing import Pool,Manager
 import os
 import fileinput

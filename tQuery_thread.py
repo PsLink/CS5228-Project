@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+# Mulitthreading version of kNN query
+
 import threading
 import fileinput
 import math

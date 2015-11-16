@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # filter of cTree
+# Prototype version
 
 import fileinput
 import math

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-
 # convert cSig to "cTree"
+
 import fileinput
 
 treeSize = 20737
@@ -77,11 +77,6 @@ def main():
 			#print 
 			outf.close()
 			tree0file.write('\n')
-
-
-
-
-		
 
 if __name__ == '__main__':
 	main()
