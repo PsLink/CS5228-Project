@@ -1,3 +1,5 @@
+
+<pre>
 convert.py  -- change the origin data into features, hashvalue and c-Signature
   |___hash.txt : output hash value
   |___cSig.txt : output cSig value
@@ -9,3 +11,4 @@ Tree.py -- build the c tree
 
 query_id - 所有＋1label的数据
 
+<pre>
